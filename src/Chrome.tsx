@@ -164,7 +164,7 @@ const isKey = (w: string) => KEY.test(w.replace(/[^\p{L}\p{N}-]/gu, ""));
 // Captions sit beside the presenter's head, as in the reference reel: the empty column
 // above her (scenes start at x = 456). Text only, in her hair colour with a purple-ink
 // outline; the word being said is white and a little bigger, key words are deeper purple.
-const CAPTION_COLUMN = { left: 16, width: 440, bottom: 586 };
+const CAPTION_COLUMN = { left: 16, width: 440, bottom: 600 };
 const fontFor = (w: string) => Math.min(58, Math.floor(CAPTION_COLUMN.width / (w.length * 0.62)));
 
 export const Captions = () => {

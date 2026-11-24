@@ -92,7 +92,7 @@ export const DemoVideo = ({ showNarration }: DemoVideoProps) => {
       <TitleCard />
       <Presenter
         name="Narrator"
-        style={{ position: "absolute", left: 0, bottom: 40 }}
+        style={{ position: "absolute", left: -120, top: 470 }}
       />
       <Footer />
       {showNarration ? <Captions /> : null}
