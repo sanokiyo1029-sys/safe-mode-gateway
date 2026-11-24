@@ -87,7 +87,7 @@ The new part is the combination. Because the gateway works at the MCP layer, one
 
 ## This repo
 
-The design is in [ARCHITECTURE.md](ARCHITECTURE.md). The demo video is a [Remotion](https://www.remotion.dev) project (1920×1080, 30 fps, 5 minutes) with an animated 2D presenter.
+The design is in [ARCHITECTURE.md](ARCHITECTURE.md). The demo video is a [Remotion](https://www.remotion.dev) project (1920×1080, 30 fps, 5 minutes) with an original animated 2D presenter, drawn in SVG, whose expression changes line by line.
 
 ```console
 npm i
