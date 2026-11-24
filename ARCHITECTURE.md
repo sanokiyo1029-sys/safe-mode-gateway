@@ -4,7 +4,7 @@ Safe-Mode Gateway is an MCP proxy that sits between an AI agent and its tools. E
 
 The gateway runs on **AWS**: Lambda for the proxy, DynamoDB for the log, S3 for undo snapshots, Secrets Manager for keys. **ElevenLabs** gives it a voice: a paused call is read aloud to the operator, who can answer by voice.
 
-> The demo video (`out/safe-mode-gateway-demo.mp4`) is an animated mock, and none of this runs yet. For a sponsor prize to count, the pieces below have to be built for real. If one doesn't get built, cut it from the video before you submit.
+> **Status:** this is the design for the 24-hour hack-day build. The demo video in this repo is an animated walkthrough of the flow.
 
 ## Diagram
 
@@ -110,10 +110,9 @@ A JSON file deployed with the Lambda maps each tool to a class, and each class t
 6. Undo: the inverse rename first, then S3 snapshots for content writes.
 7. Stretch: Bedrock tool classification.
 
-## What the video shows
+## Where the video shows it
 
-- **"How it works":** the gateway "on AWS Lambda", with badges for the log on DynamoDB, undo on S3, and voice on ElevenLabs.
-- **Both approval cards:** a "Read aloud · ElevenLabs" chip with moving sound bars.
-- **Activity log windows:** titled "· DynamoDB"; the undo line says "undo record in DynamoDB".
-- **Footer:** "Runs on AWS · Voice by ElevenLabs".
-- **Narration:** your script word for word. The narrator voice is VoiceStudio, not ElevenLabs.
+- **"How it works":** the gateway on AWS Lambda, with the activity log on DynamoDB, undo on S3, and voice on ElevenLabs.
+- **Approval cards:** a "Read aloud · ElevenLabs" chip while the card is spoken.
+- **Activity log and undo record:** stored in DynamoDB.
+- **Narrator:** the video's narrator voice was made locally with VoiceStudio, separate from the product's ElevenLabs voice.
