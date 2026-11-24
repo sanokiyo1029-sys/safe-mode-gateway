@@ -5,3 +5,7 @@ dist
 
 # Ignore the output video from Git but not videos you import into src/.
 out
+
+# Regenerable voice takes (scripts/build-voice.mjs); the mixed narration.wav stays tracked.
+public/voice/clips
+voice-samples

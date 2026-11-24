@@ -1,54 +1,40 @@
-# Remotion video
+# Safe-Mode Gateway: demo video
 
-<p align="center">
-  <a href="https://github.com/remotion-dev/logo">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://github.com/remotion-dev/logo/raw/main/animated-logo-banner-dark.apng">
-      <img alt="Animated Remotion Logo" src="https://github.com/remotion-dev/logo/raw/main/animated-logo-banner-light.gif">
-    </picture>
-  </a>
-</p>
+A 5-minute animated demo of **Safe-Mode Gateway**, an MCP approval gateway (Track 1). It sits between an AI agent and its tools, lets read calls through, pauses risky ones for a human decision, can undo approved changes, and logs everything.
 
-Welcome to your Remotion project!
+The video is built with [Remotion](https://www.remotion.dev): 1920×1080, 30 fps, 9000 frames. An animated knight narrates it in an explainer-reel style, with a title card, word-by-word captions, and sticker-style cards. The planned AWS + ElevenLabs architecture is in [ARCHITECTURE.md](ARCHITECTURE.md).
 
-## Commands
+The rendered MP4 is attached to the repo's releases.
 
-**Install Dependencies**
+## Run it
 
 ```console
-npm i --loglevel=error
+npm i
+npm run dev                                   # Remotion Studio
+npx remotion render SafeModeGatewayDemo out/safe-mode-gateway-demo.mp4
 ```
 
-**Start Preview**
+## Change the narration
+
+1. Edit the script in `src/script.ts`. It is the single source for the voice and the captions.
+2. Rebuild the voiceover:
+
+   ```console
+   node scripts/build-voice.mjs --force
+   ```
+
+   This needs [VoiceStudio](https://github.com/debpalash/voicestudio) running locally with a voice named "Knight narrator". `VOICE_SEED` (default 2024) and `VOICE_SPEED` (default 1.0) pick the take. Use `--fake` to make stand-in timing without any audio.
+
+The scene animations are timed to each sentence's cue frame. If you change the text, check the scenes in Studio.
+
+## Checks
 
 ```console
-npm run dev
+node scripts/check-narration.mjs
+npx tsc --noEmit
+npx eslint src
 ```
 
-**Render video**
+## Credits
 
-```console
-npx remotion render
-```
-
-**Upgrade Remotion**
-
-```console
-npx remotion upgrade
-```
-
-## Docs
-
-Get started with Remotion by reading the [fundamentals page](https://www.remotion.dev/docs/the-fundamentals).
-
-## Help
-
-We provide help on our [Discord server](https://discord.gg/6VzzNDwUwV).
-
-## Issues
-
-Found an issue with Remotion? [File an issue here](https://github.com/remotion-dev/remotion/issues/new).
-
-## License
-
-Note that for some entities a company license is needed. [Read the terms here](https://github.com/remotion-dev/remotion/blob/main/LICENSE.md).
+The voiceover was generated locally with VoiceStudio using the OmniVoice model (k2-fsa/OmniVoice), whose weights are licensed CC-BY-NC, non-commercial. The knight is an original SVG drawing.
