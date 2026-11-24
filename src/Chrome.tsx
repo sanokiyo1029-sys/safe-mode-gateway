@@ -2,11 +2,12 @@ import { AbsoluteFill, Easing, interpolate, useCurrentFrame } from "remotion";
 import { c, display, sans, sticker } from "./theme";
 import timing from "./voice-timing.json";
 
-// The explainer-reel frame around the scenes: blue backdrop, a title card with
-// chapter dots on top, a footer bar, and word-by-word caption chips.
+// The explainer-reel frame around the scenes: white and purple backdrop, a title card
+// with chapter dots that flips down on every change, a footer bar, and caption chips
+// that flip up word by word.
 
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
-const pop = Easing.out(Easing.back(2.2));
+const flip = Easing.out(Easing.back(1.7));
 
 // Horizontal centre of the scene area (scenes are drawn at 80% from x = 360).
 export const CONTENT_X = 1128;
@@ -14,13 +15,13 @@ export const CONTENT_X = 1128;
 export const Backdrop = () => (
   <AbsoluteFill
     style={{
-      background: `radial-gradient(ellipse 80% 75% at 58% 42%, #3A69F2 0%, ${c.bg} 50%, ${c.bgDeep} 100%)`,
+      background: `radial-gradient(ellipse 85% 80% at 58% 42%, #FFFFFF 0%, #F8F6FC 55%, ${c.bgDeep} 100%)`,
     }}
   >
     <AbsoluteFill
       style={{
         backgroundImage:
-          "linear-gradient(#FFFFFF0B 1.5px, transparent 1.5px), linear-gradient(90deg, #FFFFFF0B 1.5px, transparent 1.5px)",
+          "linear-gradient(#6D678112 1.5px, transparent 1.5px), linear-gradient(90deg, #6D678112 1.5px, transparent 1.5px)",
         backgroundSize: "28px 28px",
       }}
     />
@@ -51,7 +52,7 @@ const Accented = ({ text }: { readonly text: string }) => (
   <>
     {text.split(/(\*[^*]+\*)/).map((part, i) =>
       part.startsWith("*") ? (
-        <span key={i} style={{ color: c.accent }}>
+        <span key={i} style={{ color: c.lilac }}>
           {part.slice(1, -1)}
         </span>
       ) : (
@@ -72,45 +73,42 @@ export const TitleCard = () => {
         left: CONTENT_X,
         top: 34,
         translate: "-50% 0",
-        padding: "12px 38px 14px",
-        borderRadius: 22,
-        backgroundColor: "#161B45",
-        boxShadow: sticker,
-        textAlign: "center",
+        perspective: 900,
         opacity: interpolate(frame, [8, 22], [0, 1], clamp),
-        scale: interpolate(local, [0, 12], [0.86, 1], { ...clamp, easing: pop }),
       }}
     >
-      <div style={{ fontFamily: sans, fontSize: 15, fontWeight: 800, letterSpacing: 4, color: "#AFC0FF" }}>
-        {card.kicker}
-      </div>
       <div
         style={{
-          fontFamily: display,
-          fontSize: 54,
-          fontWeight: 900,
-          lineHeight: 1.08,
-          color: c.text,
-          whiteSpace: "nowrap",
-          opacity: interpolate(local, [0, 6], [0, 1], clamp),
+          padding: "12px 38px 14px",
+          borderRadius: 22,
+          backgroundColor: c.ink,
+          boxShadow: sticker,
+          textAlign: "center",
+          transformOrigin: "50% 0%",
+          rotate: `x ${interpolate(local, [0, 16], [-100, 0], { ...clamp, easing: flip })}deg`,
         }}
       >
-        <Accented text={card.title} />
-      </div>
-      <div style={{ display: "flex", justifyContent: "center", gap: 10, marginTop: 8 }}>
-        {[0, 1, 2, 3, 4, 5].map((i) => (
-          <div
-            key={i}
-            style={{
-              width: 11,
-              height: 11,
-              borderRadius: 6,
-              boxSizing: "border-box",
-              border: `2px solid ${i <= card.chapter ? c.accent : "#5C6AB0"}`,
-              backgroundColor: i === card.chapter ? c.accent : i < card.chapter ? "#8FB0FF66" : "transparent",
-            }}
-          />
-        ))}
+        <div style={{ fontFamily: sans, fontSize: 15, fontWeight: 800, letterSpacing: 4, color: c.hair }}>
+          {card.kicker}
+        </div>
+        <div style={{ fontFamily: display, fontSize: 54, fontWeight: 900, lineHeight: 1.08, color: "#FFFFFF", whiteSpace: "nowrap" }}>
+          <Accented text={card.title} />
+        </div>
+        <div style={{ display: "flex", justifyContent: "center", gap: 10, marginTop: 8 }}>
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <div
+              key={i}
+              style={{
+                width: 11,
+                height: 11,
+                borderRadius: 6,
+                boxSizing: "border-box",
+                border: `2px solid ${i <= card.chapter ? c.lilac : "#6D6781"}`,
+                backgroundColor: i === card.chapter ? c.lilac : i < card.chapter ? "#CFC6F580" : "transparent",
+              }}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -125,25 +123,26 @@ export const Footer = () => (
       bottom: 0,
       height: 88,
       borderRadius: "28px 28px 0 0",
-      borderTop: "2px solid #FFFFFF26",
-      background: "linear-gradient(180deg, #27318A 0%, #1A2160 100%)",
+      borderTop: "2px solid #FFFFFF33",
+      background: `linear-gradient(180deg, #4A3F78 0%, ${c.ink} 100%)`,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       fontFamily: display,
       fontSize: 38,
       fontWeight: 900,
-      color: c.text,
+      color: "#FFFFFF",
     }}
   >
     Safe-Mode Gateway
-    <div style={{ position: "absolute", right: 40, fontFamily: sans, fontSize: 19, fontWeight: 600, color: c.muted }}>
-      Runs on <span style={{ color: "#FF9900" }}>AWS</span> · Voice by <span style={{ color: c.paper }}>ElevenLabs</span>
+    <div style={{ position: "absolute", right: 40, fontFamily: sans, fontSize: 19, fontWeight: 600, color: c.hair }}>
+      Runs on <span style={{ color: "#FF9900" }}>AWS</span> · Voice by <span style={{ color: "#FFFFFF" }}>ElevenLabs</span>
     </div>
   </div>
 );
 
-// Words in chips of up to three, a new chip group after punctuation.
+// Words in chips of up to three, a new chip group after punctuation. The word being said
+// is filled purple; key words of the demo get a purple chip.
 type Word = { readonly w: string; readonly f: number };
 const groups = timing.flatMap((line) => {
   const out: Word[][] = [];
@@ -158,38 +157,59 @@ const groups = timing.flatMap((line) => {
   return out.map((words, i) => ({ words, end: i + 1 < out.length ? out[i + 1][0].f : line.end + 12 }));
 });
 
+const KEY =
+  /^(safe-mode|gateway|delete|deletion|deleting|destructive|deny|denied|approve|approved|approval|undo|policy|log|mcp|search|rename|renaming|three)$/i;
+const isKey = (w: string) => KEY.test(w.replace(/[^\p{L}\p{N}-]/gu, ""));
+
+// Captions sit beside the presenter's head, as in the reference reel: the empty column
+// above her (scenes start at x = 456). Text only, in her hair colour with a purple-ink
+// outline; the word being said is white and a little bigger, key words are deeper purple.
+const CAPTION_COLUMN = { left: 16, width: 440, bottom: 548 };
+const fontFor = (w: string) => Math.min(58, Math.floor(CAPTION_COLUMN.width / (w.length * 0.62)));
+
 export const Captions = () => {
   const frame = useCurrentFrame();
   const group = groups.find((g) => frame >= g.words[0].f && frame < g.end);
   if (!group) {
     return null;
   }
+  const active = [...group.words].reverse().find((w) => frame >= w.f);
   return (
-    <div style={{ position: "absolute", left: CONTENT_X, top: 916, translate: "-50% 0", display: "flex", gap: 12 }}>
+    <div
+      style={{
+        position: "absolute",
+        ...CAPTION_COLUMN,
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: "center",
+        alignContent: "flex-end",
+        columnGap: 18,
+        rowGap: 2,
+        perspective: 700,
+      }}
+    >
       {group.words.map((word) => {
         const t = frame - word.f;
+        const on = word === active;
         return (
           <div
             key={word.f}
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              padding: "3px 18px 7px 12px",
-              borderRadius: 14,
-              border: `3px solid ${c.ink}`,
-              backgroundColor: c.paper,
-              boxShadow: "0 0 0 4px #FFFFFF66, 0 10px 20px #0A1A6E55",
               fontFamily: display,
-              fontSize: 38,
-              fontWeight: 800,
-              color: c.ink,
+              fontSize: fontFor(word.w),
+              fontWeight: 900,
+              lineHeight: 1.15,
               whiteSpace: "nowrap",
+              color: on ? "#FFFFFF" : isKey(word.w) ? "#8F80DA" : c.hair,
+              WebkitTextStroke: `7px ${c.ink}`,
+              paintOrder: "stroke fill",
+              textShadow: `0 5px 0 ${c.ink}, 0 10px 18px #6D678155`,
+              transformOrigin: "50% 100%",
               opacity: interpolate(t, [0, 3], [0, 1], clamp),
-              scale: interpolate(t, [0, 7], [0.5, 1], { ...clamp, easing: pop }),
+              rotate: `x ${interpolate(t, [0, 10], [-90, 0], { ...clamp, easing: flip })}deg`,
+              scale: t < 10 ? interpolate(t, [0, 10], [0.6, 1], { ...clamp, easing: flip }) : on ? 1.1 : 1,
             }}
           >
-            <div style={{ width: 12, height: 12, borderRadius: 6, marginTop: 4, backgroundColor: c.bg, border: `2px solid ${c.ink}` }} />
             {word.w}
           </div>
         );

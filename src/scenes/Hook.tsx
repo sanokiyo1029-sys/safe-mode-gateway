@@ -171,7 +171,7 @@ const HookInner = () => {
             style={{
               fontFamily: sans,
               fontSize: 48,
-              color: "#DCE4FF",
+              color: c.muted,
               opacity: interpolate(frame, [1147, 1170], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
             }}
           >

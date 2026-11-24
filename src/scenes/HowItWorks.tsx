@@ -21,7 +21,7 @@ const aws = "#FF9900";
 const services = [
   { job: "Log", name: "DynamoDB", dot: aws, at: 250 },
   { job: "Undo", name: "S3", dot: aws, at: 262 },
-  { job: "Voice", name: "ElevenLabs", dot: "#FFFFFF", at: 274 },
+  { job: "Voice", name: "ElevenLabs", dot: "#7B6CC9", at: 274 },
 ];
 
 const serviceChip = {
@@ -30,9 +30,9 @@ const serviceChip = {
   gap: 8,
   padding: "8px 16px",
   borderRadius: 999,
-  backgroundColor: "#161B45",
-  border: "2px solid #FFFFFF",
-  boxShadow: "0 8px 18px #0A1A6E55",
+  backgroundColor: "#FFFFFF",
+  border: "2px solid #2B2540",
+  boxShadow: "0 8px 18px #6D678140",
   fontFamily: sans,
   fontSize: 21,
   fontWeight: 600,
@@ -185,10 +185,10 @@ const HowItWorksInner = () => {
               height: "100%",
               border: `3px solid ${c.accent}`,
               boxShadow: `0 0 70px ${c.accent}40`,
-              backgroundColor: "#141B33",
+              backgroundColor: c.ink, color: "#FFFFFF",
             }}
           >
-            <svg width={64} height={64} viewBox="0 0 24 24" fill="none" stroke={c.accent} strokeWidth={1.8}>
+            <svg width={64} height={64} viewBox="0 0 24 24" fill="none" stroke={c.lilac} strokeWidth={1.8}>
               <path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z" />
               <path d="M9 12l2 2 4-4" />
             </svg>
@@ -229,7 +229,7 @@ const HowItWorksInner = () => {
             fontFamily: sans,
             fontSize: 28,
             fontWeight: 600,
-            color: "#DCE4FF",
+            color: c.accent,
             opacity: interpolate(frame, [370, 390], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
           }}
         >

@@ -194,8 +194,8 @@ export const Bubble: React.FC<{
         padding: "14px 20px",
         borderRadius: 16,
         color: c.text,
-        backgroundColor: who === "you" ? "#2D3C9A" : c.panel2,
-        border: `2px solid ${who === "you" ? "#4A5CC0" : c.line}`,
+        backgroundColor: who === "you" ? c.wash : c.panel2,
+        border: `2px solid ${who === "you" ? c.lilac : c.line}`,
       }}
     >
       {children}
@@ -228,7 +228,7 @@ export const Button: React.FC<{
       fontFamily: sans,
       fontSize: 27,
       fontWeight: 700,
-      color: tone === "approve" ? "#06281C" : tone === "deny" ? "#FFFFFF" : c.text,
+      color: tone === "approve" ? "#FFFFFF" : tone === "deny" ? "#FFFFFF" : c.text,
       backgroundColor: tone === "approve" ? c.read : tone === "deny" ? "#DC4A4A" : "transparent",
       border: tone === "ghost" ? `2px solid ${c.line}` : "2px solid transparent",
     }}
@@ -251,7 +251,7 @@ export const Cursor: React.FC = () => (
 
 export const Eyebrow: React.FC<{ readonly children: React.ReactNode; readonly color?: string }> = ({
   children,
-  color = "#DCE4FF",
+  color = c.accent,
 }) => (
   <div style={{ fontFamily: sans, fontSize: 24, fontWeight: 700, letterSpacing: 4, color }}>
     {children}
@@ -369,18 +369,18 @@ export const VoiceChip: React.FC<{ readonly t: number }> = ({ t }) => (
       padding: "8px 20px 8px 16px",
       borderRadius: 999,
       backgroundColor: "#FFFFFF",
-      border: "3px solid #141A3C",
-      boxShadow: "0 10px 24px #0A1A6E55",
+      border: "3px solid #2B2540",
+      boxShadow: "0 10px 24px #6D678140",
       fontFamily: sans,
       fontSize: 22,
       fontWeight: 700,
-      color: "#141A3C",
+      color: "#2B2540",
       whiteSpace: "nowrap",
     }}
   >
-    <svg width={26} height={26} viewBox="0 0 24 24" fill="#141A3C">
+    <svg width={26} height={26} viewBox="0 0 24 24" fill="#2B2540">
       <path d="M4 9h4l5-4v14l-5-4H4z" />
-      <path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="#141A3C" strokeWidth={2} fill="none" strokeLinecap="round" />
+      <path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="#2B2540" strokeWidth={2} fill="none" strokeLinecap="round" />
     </svg>
     <div style={{ display: "flex", alignItems: "center", gap: 3, height: 24 }}>
       {[0, 1, 2, 3, 4, 5, 6].map((i) => (
@@ -389,7 +389,7 @@ export const VoiceChip: React.FC<{ readonly t: number }> = ({ t }) => (
           style={{
             width: 4,
             borderRadius: 2,
-            backgroundColor: "#2350E0",
+            backgroundColor: "#7B6CC9",
             height: t > 0 && t < 150 ? 6 + Math.abs(Math.sin(t / 3 + i * 1.7)) * 18 : 6,
           }}
         />

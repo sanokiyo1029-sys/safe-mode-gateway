@@ -168,7 +168,7 @@ const AllowBlockInner = () => {
             fontWeight: 700,
             color: c.danger,
             border: `2px solid ${c.danger}88`,
-            backgroundColor: frame >= 440 ? "#3A1518" : c.panel2,
+            backgroundColor: frame >= 440 ? "#FDECEC" : c.panel2,
             opacity: interpolate(frame, [345, 365], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
           }}
         >
@@ -237,8 +237,8 @@ const AllowBlockInner = () => {
             width: 1070,
             height: 790,
             borderRadius: 20,
-            backgroundColor: "#05070C",
-            opacity: interpolate(frame, [831, 850, 1300, 1325], [0, 0.65, 0.65, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
+            backgroundColor: "#2B2540",
+            opacity: interpolate(frame, [831, 850, 1300, 1325], [0, 0.35, 0.35, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
           }}
         />
         <Interactive.Div
@@ -254,7 +254,7 @@ const AllowBlockInner = () => {
             borderRadius: 22,
             backgroundColor: c.panel,
             border: `3px solid ${c.danger}`,
-            boxShadow: "0 40px 120px #000000B0",
+            boxShadow: "0 40px 120px #2B254066",
             fontFamily: sans,
             color: c.text,
             opacity: interpolate(frame, [831, 850, 1300, 1325], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),

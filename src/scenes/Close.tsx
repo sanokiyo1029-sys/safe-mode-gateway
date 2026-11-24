@@ -10,7 +10,7 @@ const num = {
   height: 96,
   marginRight: 34,
   borderRadius: 22,
-  backgroundColor: "#161B45",
+  backgroundColor: "#FFFFFF",
   boxShadow: sticker,
 } as const;
 
@@ -87,7 +87,7 @@ const CloseInner = () => {
               width: 380,
               height: 200,
               borderRadius: 20,
-              backgroundColor: "#141B33",
+              backgroundColor: c.ink,
               border: `3px solid ${c.accent}`,
               boxShadow: `0 0 70px ${c.accent}40`,
               display: "flex",
@@ -96,7 +96,7 @@ const CloseInner = () => {
               fontFamily: sans,
               fontSize: 36,
               fontWeight: 800,
-              color: c.text,
+              color: "#FFFFFF",
             }}
           >
             Safe-Mode Gateway
@@ -194,7 +194,7 @@ const CloseInner = () => {
               <path d="M9 12l2 2 4-4" />
             </svg>
             <span style={{ fontSize: 52, fontWeight: 800 }}>Safe-Mode Gateway</span>
-            <span style={{ fontSize: 36, color: "#DCE4FF" }}>answers all three.</span>
+            <span style={{ fontSize: 36, color: c.muted }}>answers all three.</span>
           </Interactive.Div>
         </Interactive.Div>
       </Interactive.Div>

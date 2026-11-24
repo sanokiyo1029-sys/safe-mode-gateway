@@ -18,21 +18,25 @@ export const display = loadFraunces("normal", {
   subsets: ["latin"],
 }).fontFamily;
 
+// White and purple, taken from the presenter's hair (#BCB7CE, shadows #6D6781).
 export const c = {
-  bg: "#2350E0",
-  bgDeep: "#1A3CC0",
-  panel: "#1B2152",
-  panel2: "#151A42",
-  line: "#2E3778",
-  ink: "#141A3C",
+  bg: "#FFFFFF",
+  bgDeep: "#ECE8F6",
+  panel: "#FFFFFF",
+  panel2: "#F6F4FB",
+  line: "#E3DFEE",
+  ink: "#2B2540", // outlines, body text, the dark title card and footer
   paper: "#FFFFFF",
-  text: "#F4F6FF",
-  muted: "#A9B4E0",
-  accent: "#8FB0FF",
-  read: "#34D399",
-  write: "#FBBF24",
-  danger: "#F87171",
+  text: "#2B2540",
+  muted: "#7A7392",
+  accent: "#7B6CC9", // purple for highlights on white
+  hair: "#BCB7CE",
+  lilac: "#CFC6F5", // accent on the dark purple card and footer
+  wash: "#EFEBFA", // soft purple fill for chips and bubbles
+  read: "#15994A",
+  write: "#C27A06",
+  danger: "#D8343A",
 };
 
-// White sticker ring plus a soft drop shadow, as on every card in the reference reel.
-export const sticker = "0 0 0 3px #141A3C, 0 0 0 9px #FFFFFF, 0 22px 44px #0A1A6E66";
+// Purple-ink outline, white ring and a soft purple shadow: the reel's sticker cards, on white.
+export const sticker = "0 0 0 3px #2B2540, 0 0 0 9px #FFFFFF, 0 0 0 10px #E3DFEE, 0 20px 40px #6D678140";

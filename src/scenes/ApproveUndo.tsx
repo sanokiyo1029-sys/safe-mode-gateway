@@ -206,8 +206,8 @@ const ApproveUndoInner = () => {
             width: 1070,
             height: 790,
             borderRadius: 20,
-            backgroundColor: "#05070C",
-            opacity: interpolate(frame, [276, 295, 640, 665], [0, 0.65, 0.65, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
+            backgroundColor: "#2B2540",
+            opacity: interpolate(frame, [276, 295, 640, 665], [0, 0.35, 0.35, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
           }}
         />
         <Interactive.Div
@@ -223,7 +223,7 @@ const ApproveUndoInner = () => {
             borderRadius: 22,
             backgroundColor: c.panel,
             border: `3px solid ${c.write}`,
-            boxShadow: "0 40px 120px #000000B0",
+            boxShadow: "0 40px 120px #2B254066",
             fontFamily: sans,
             color: c.text,
             opacity: interpolate(frame, [276, 295, 640, 665], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
