@@ -1,14 +1,19 @@
-// Builds the knight's voiceover from src/script.ts with VoiceStudio.
+// Builds the narrator's voiceover from src/script.ts.
 //
 //   node scripts/build-voice.mjs            synthesize missing clips, mix, write envelope
 //   node scripts/build-voice.mjs --force    re-synthesize every clip
 //   node scripts/build-voice.mjs --fake     no audio: a stand-in mouth envelope from timing
+//   node scripts/build-voice.mjs --scenes   cut voice-scenes/scene1..6 recordings into clips, then mix
 //
-// Each sentence is spoken into public/voice/clips/, placed on the frame where the
-// visuals expect it (narration-timing.ts), mixed into public/voice/narration.wav,
+// Each sentence is spoken into public/voice/clips/<engine>/, placed on the frame where
+// the visuals expect it (narration-timing.ts), mixed into public/voice/narration.wav,
 // its loudness per video frame goes to src/voice-envelope.json for lip sync, and
 // each line's start, end and estimated word times go to src/voice-timing.json.
-// VOICE_SEED and VOICE_SPEED pick the take (defaults 2024 and 1.0).
+//
+// Engines:
+//   elevenlabs   used when ELEVENLABS_API_KEY is set. Put ELEVENLABS_API_KEY and
+//                ELEVENLABS_VOICE_ID in a .env file next to package.json (git-ignored).
+//   voicestudio  local VoiceStudio; VOICE_NAME, VOICE_SEED and VOICE_SPEED pick the take.
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -16,13 +21,16 @@ import { fileURLToPath } from "node:url";
 import { SCENES, FPS, TOTAL_SECONDS } from "../src/script.ts";
 import { timeSentences } from "../src/narration-timing.ts";
 
+const root = fileURLToPath(new URL("..", import.meta.url));
+if (existsSync(join(root, ".env"))) process.loadEnvFile(join(root, ".env"));
+
+const ENGINE = process.env.VOICE_ENGINE ?? (process.env.ELEVENLABS_API_KEY ? "elevenlabs" : "voicestudio");
 const VOICE = process.env.VOICE_NAME ?? "Knight narrator";
 const SEED = process.env.VOICE_SEED ?? "2024";
 const SPEED = process.env.VOICE_SPEED ?? "1.0";
 const CLI = join(process.env.LOCALAPPDATA ?? "", "Programs/VoiceStudio/resources/cli/voicestudio.exe");
 const RATE = 48000;
-const root = fileURLToPath(new URL("..", import.meta.url));
-const clipsDir = join(root, "public/voice/clips");
+const clipsDir = join(root, "public/voice/clips", ENGINE);
 const totalFrames = TOTAL_SECONDS * FPS;
 const args = new Set(process.argv.slice(2));
 
@@ -135,17 +143,126 @@ if (args.has("--fake")) {
   process.exit(0);
 }
 
-if (!existsSync(CLI)) throw new Error(`VoiceStudio CLI not found at ${CLI}`);
+// ElevenLabs text-to-speech for one line. previous/next text keep the delivery
+// flowing across separately generated sentences. The MP3 is converted to WAV for mixing.
+const speakElevenLabs = async (text, previous, next, file) => {
+  const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(process.env.ELEVENLABS_VOICE_ID)}?output_format=mp3_44100_128`, {
+    method: "POST",
+    headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      text,
+      model_id: process.env.ELEVENLABS_MODEL ?? "eleven_multilingual_v2",
+      previous_text: previous,
+      next_text: next,
+    }),
+    signal: AbortSignal.timeout(60_000),
+  });
+  if (!res.ok) throw new Error(`ElevenLabs ${res.status}: ${(await res.text()).slice(0, 300)}`);
+  const mp3 = file.replace(/\.wav$/, ".mp3");
+  writeFileSync(mp3, Buffer.from(await res.arrayBuffer()));
+  execFileSync("ffmpeg", ["-hide_banner", "-loglevel", "error", "-y", "-i", mp3, "-ac", "1", "-ar", String(RATE), "-c:a", "pcm_s16le", file]);
+};
+
+// --scenes: whole-scene recordings in voice-scenes/scene1..6 (.mp3 or .wav), e.g. made on the
+// ElevenLabs website, are cut into sentence clips at their longest silences, then mixed as usual.
+const splitScenes = () => {
+  mkdirSync(clipsDir, { recursive: true });
+  SCENES.forEach((scene, si) => {
+    const src = ["mp3", "wav"].map((ext) => join(root, "voice-scenes", `scene${si + 1}.${ext}`)).find(existsSync);
+    if (!src) throw new Error(`missing voice-scenes/scene${si + 1}.mp3`);
+    const tmp = join(clipsDir, `scene${si + 1}.wav`);
+    execFileSync("ffmpeg", ["-hide_banner", "-loglevel", "error", "-y", "-i", src, "-ac", "1", "-ar", String(RATE), "-c:a", "pcm_s16le", tmp]);
+    const audio = readWav(tmp);
+    const ids = lines.filter((l) => l.id.startsWith(`${scene.id}-`)).map((l) => l.id);
+    const win = RATE / 100;
+    const rms = [];
+    for (let i = 0; i + win <= audio.length; i += win) {
+      let sum = 0;
+      for (let j = 0; j < win; j++) sum += audio[i + j] ** 2;
+      rms.push(Math.sqrt(sum / win));
+    }
+    const gate = rms.reduce((a, b) => Math.max(a, b), 0) * 0.04;
+    const first = rms.findIndex((v) => v > gate);
+    const last = rms.findLastIndex((v) => v > gate);
+    const gaps = [];
+    for (let w = first, start = -1; w <= last; w++) {
+      if (rms[w] <= gate && start < 0) start = w;
+      if (rms[w] > gate && start >= 0) {
+        if (w - start >= 8) gaps.push({ start, end: w });
+        start = -1;
+      }
+    }
+    // Pick all N-1 cuts at once (dynamic programming over the pauses): each sentence should
+    // last about its share of the scene's letters, and longer pauses are preferred, since the
+    // pauses between sentences are usually longer than the ones at commas.
+    const n = ids.length;
+    if (gaps.length < n - 1) throw new Error(`scene${si + 1}: found ${gaps.length + 1} phrases, need ${n}`);
+    const sizes = ids.map((id) => lines.find((l) => l.id === id).text.length);
+    const total = sizes.reduce((a, b) => a + b, 0);
+    const expected = sizes.map((s) => (s / total) * (last - first));
+    const len = (g) => g.end - g.start;
+    const longest = Math.max(...gaps.map(len));
+    const seg = (i, a, b) => ((b - a - expected[i]) / expected[i]) ** 2;
+    const bonus = (g) => (0.5 * len(g)) / longest;
+    // best[k][j]: lowest cost with cut k (0-based) at gap j; from[k][j]: gap of cut k-1.
+    const best = [gaps.map((g) => seg(0, first, g.start) - bonus(g))];
+    const from = [gaps.map(() => -1)];
+    for (let k = 1; k < n - 1; k++) {
+      best.push([]);
+      from.push([]);
+      gaps.forEach((g, j) => {
+        let cost = Infinity, prev = -1;
+        for (let p = 0; p < j; p++) {
+          const c = best[k - 1][p] + seg(k, gaps[p].end, g.start);
+          if (c < cost) [cost, prev] = [c, p];
+        }
+        best[k].push(cost - bonus(g));
+        from[k].push(prev);
+      });
+    }
+    let j = -1, cost = Infinity;
+    gaps.forEach((g, q) => {
+      const c = best[n - 2][q] + seg(n - 1, g.end, last + 1);
+      if (c < cost) [cost, j] = [c, q];
+    });
+    const cuts = [];
+    for (let k = n - 2; k >= 0; k--) {
+      cuts.unshift(gaps[j]);
+      j = from[k][j];
+    }
+    const bounds = [first, ...cuts.flatMap((g) => [g.start, g.end]), last + 1];
+    ids.forEach((id, i) => {
+      const from = Math.max(0, bounds[i * 2] - 5) * win;
+      const to = Math.min(rms.length, bounds[i * 2 + 1] + 5) * win;
+      writeWav(join(clipsDir, `${id}.wav`), audio.subarray(from, to));
+    });
+    console.log(`scene${si + 1}: ${ids.length} clips`);
+  });
+};
+if (args.has("--scenes")) splitScenes();
+
+if (ENGINE === "elevenlabs" && !args.has("--scenes")) {
+  if (!process.env.ELEVENLABS_API_KEY || !process.env.ELEVENLABS_VOICE_ID) {
+    throw new Error("ElevenLabs needs ELEVENLABS_API_KEY and ELEVENLABS_VOICE_ID (put them in .env)");
+  }
+} else if (!existsSync(CLI)) {
+  throw new Error(`VoiceStudio CLI not found at ${CLI}`);
+}
+console.log(`engine: ${ENGINE}${ENGINE === "elevenlabs" ? ` (voice ${process.env.ELEVENLABS_VOICE_ID})` : ""}`);
 mkdirSync(clipsDir, { recursive: true });
 const mix = new Float32Array(totalFrames * (RATE / FPS));
 const report = [];
 const timed = [];
 let prevEnd = 0;
-for (const l of lines) {
+for (const [i, l] of lines.entries()) {
   const file = join(clipsDir, `${l.id}.wav`);
   if (args.has("--force") || !existsSync(file)) {
     process.stdout.write(`speaking ${l.id} ... `);
-    execFileSync(CLI, ["--url", "http://127.0.0.1:3900", "speak", "--voice", VOICE, "--seed", SEED, "--speed", SPEED, "--language", "en", "-o", file, "--overwrite", l.text], { stdio: ["ignore", "ignore", "inherit"] });
+    if (ENGINE === "elevenlabs") {
+      await speakElevenLabs(l.text, lines[i - 1]?.text ?? "", lines[i + 1]?.text ?? "", file);
+    } else {
+      execFileSync(CLI, ["--url", "http://127.0.0.1:3900", "speak", "--voice", VOICE, "--seed", SEED, "--speed", SPEED, "--language", "en", "-o", file, "--overwrite", l.text], { stdio: ["ignore", "ignore", "inherit"] });
+    }
     console.log("ok");
   }
   const clip = readWav(file);

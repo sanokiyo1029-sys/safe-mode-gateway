@@ -47,7 +47,7 @@ AI agents now act through tools: they search files, rename documents, write to d
 | Voice | **ElevenLabs** text-to-speech + Scribe speech-to-text | Reads approval cards aloud and takes spoken approve/deny |
 | Dashboard | Static site on S3 | Approval cards, buttons, voice, and the log |
 | Tool classes (stretch) | Amazon Bedrock | Suggests a class for unknown tools; the operator confirms |
-| Demo video | Remotion (React) + VoiceStudio (local TTS) | The walkthrough in this repo |
+| Demo video | Remotion (React) + ElevenLabs text-to-speech | The walkthrough in this repo |
 
 ## Architecture
 
@@ -87,7 +87,7 @@ The new part is the combination. Because the gateway works at the MCP layer, one
 
 ## This repo
 
-The design is in [ARCHITECTURE.md](ARCHITECTURE.md). The demo video is a [Remotion](https://www.remotion.dev) project (1920×1080, 30 fps, 5 minutes) with an animated knight narrator.
+The design is in [ARCHITECTURE.md](ARCHITECTURE.md). The demo video is a [Remotion](https://www.remotion.dev) project (1920×1080, 30 fps, 5 minutes) with an animated 2D presenter.
 
 ```console
 npm i
@@ -95,8 +95,8 @@ npm run dev                                   # Remotion Studio
 npx remotion render SafeModeGatewayDemo out/safe-mode-gateway-demo.mp4
 ```
 
-The narration text lives in `src/script.ts`. `node scripts/build-voice.mjs --force` rebuilds the voiceover with a local [VoiceStudio](https://github.com/debpalash/voicestudio) voice named "Knight narrator". Checks: `node scripts/check-narration.mjs`, `npx tsc --noEmit`, `npx eslint src`.
+The narration text lives in `src/script.ts`. `node scripts/build-voice.mjs --force` rebuilds the voiceover with ElevenLabs. Copy `.env.example` to `.env` and add your API key and a voice ID. On the free plan, use one of ElevenLabs' built-in voices: library voices need a paid plan through the API. A local [VoiceStudio](https://github.com/debpalash/voicestudio) voice also works. Checks: `node scripts/check-narration.mjs`, `npx tsc --noEmit`, `npx eslint src`.
 
 ## Credits
 
-The voiceover was generated locally with VoiceStudio using the OmniVoice model (k2-fsa/OmniVoice), whose weights are licensed CC-BY-NC, non-commercial. The knight is an original drawing.
+The voiceover was generated with [ElevenLabs](https://elevenlabs.io) text-to-speech, using the built-in "Jessica" voice.

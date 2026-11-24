@@ -9,3 +9,7 @@ out
 # Regenerable voice takes (scripts/build-voice.mjs); the mixed narration.wav stays tracked.
 public/voice/clips
 voice-samples
+
+# ElevenLabs website workflow: scene texts and whole-scene recordings (split into clips by build-voice).
+elevenlabs-scenes.txt
+voice-scenes

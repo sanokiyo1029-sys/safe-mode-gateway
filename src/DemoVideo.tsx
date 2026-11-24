@@ -1,7 +1,7 @@
 import { Audio } from "@remotion/media";
 import { AbsoluteFill, staticFile, Track, useVideoConfig } from "remotion";
 import { Backdrop, Captions, Footer, TitleCard } from "./Chrome";
-import { Knight } from "./Knight";
+import { Presenter } from "./Presenter";
 import { AllowBlock } from "./scenes/AllowBlock";
 import { ApproveUndo } from "./scenes/ApproveUndo";
 import { AuditTrail } from "./scenes/AuditTrail";
@@ -14,7 +14,7 @@ export type DemoVideoProps = {
 };
 
 // Scene boundaries match the script's timestamps exactly (0:00, 0:45, 1:35, 2:35, 3:40, 4:30, 5:00).
-// Explainer-reel layout: title card on top, scenes drawn at 80% to the right of the knight,
+// Explainer-reel layout: title card on top, scenes drawn at 80% to the right of the presenter,
 // word chips above the footer bar.
 export const DemoVideo = ({ showNarration }: DemoVideoProps) => {
   const { fps } = useVideoConfig();
@@ -32,10 +32,10 @@ export const DemoVideo = ({ showNarration }: DemoVideoProps) => {
         </Track>
       </AbsoluteFill>
       <TitleCard />
-      <Knight name="Knight narrator" style={{ position: "absolute", left: 6, bottom: 0 }} />
+      <Presenter name="Narrator" style={{ position: "absolute", left: 0, bottom: 40 }} />
       <Footer />
       {showNarration ? <Captions /> : null}
-      <Audio name="Knight voiceover" src={staticFile("voice/narration.wav")} />
+      <Audio name="Voiceover" src={staticFile("voice/narration.wav")} />
     </AbsoluteFill>
   );
 };

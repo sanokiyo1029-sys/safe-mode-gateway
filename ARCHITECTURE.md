@@ -115,4 +115,4 @@ A JSON file deployed with the Lambda maps each tool to a class, and each class t
 - **"How it works":** the gateway on AWS Lambda, with the activity log on DynamoDB, undo on S3, and voice on ElevenLabs.
 - **Approval cards:** a "Read aloud · ElevenLabs" chip while the card is spoken.
 - **Activity log and undo record:** stored in DynamoDB.
-- **Narrator:** the video's narrator voice was made locally with VoiceStudio, separate from the product's ElevenLabs voice.
+- **Narrator:** the video's voiceover is ElevenLabs text-to-speech (the built-in "Jessica" voice).
