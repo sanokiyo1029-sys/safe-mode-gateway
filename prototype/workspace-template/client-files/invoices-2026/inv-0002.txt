@@ -1,0 +1,3 @@
+Invoice INV-0002 (demo data)
+Client: Contoso
+Amount: 2,150.00

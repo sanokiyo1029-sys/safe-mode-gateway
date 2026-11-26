@@ -14,7 +14,7 @@ An approval gateway for MCP: reads run, risky tool calls pause for a human,<br>a
 ![ElevenLabs](https://img.shields.io/badge/ElevenLabs-voice_approvals-000000?style=flat-square)
 ![Remotion](https://img.shields.io/badge/demo-Remotion-0B84F3?style=flat-square)
 
-**[▶ Watch the 5-minute demo](https://github.com/sanokiyo1029-sys/safe-mode-gateway/releases/latest)** · [Architecture](ARCHITECTURE.md) · [Run the video](#run-the-demo-video)
+**[▶ Watch the 5-minute demo](https://github.com/sanokiyo1029-sys/safe-mode-gateway/releases/latest)** · [Try the working prototype](#try-the-working-prototype) · [Architecture](ARCHITECTURE.md)
 
 </div>
 
@@ -66,6 +66,25 @@ flowchart LR
 | 3:40 | The activity log |
 | 4:30 | Three questions every team should be able to answer |
 
+## Try the working prototype
+
+A real MCP gateway with a live operator dashboard runs locally from [`prototype/`](prototype/README.md). Any MCP agent can connect to it, including Claude, and a built-in demo agent replays the video's story with no AI model needed.
+
+![The operator dashboard with a delete waiting for a decision](docs/prototype.png)
+
+```console
+cd prototype && npm install && npm start      # open http://127.0.0.1:8787
+```
+
+What you can do in it:
+- Watch reads run on their own while writes and deletes stop on an approval card.
+- Approve or deny by click, by keyboard (**A** / **D**), or by voice, with the card read aloud by ElevenLabs.
+- Undo approved changes.
+- Switch each class between Run, Ask and Block.
+- Read and download the append-only activity log.
+
+To connect Claude Code, run `claude mcp add --transport http safe-mode http://127.0.0.1:8787/mcp`.
+
 ## Features
 
 - **Three classes of tool call** with a fail-safe default: anything unknown pauses.
@@ -107,12 +126,13 @@ Request flows, voice rules, the data model, security and the hack-day build orde
 - **Feasibility:** a thin proxy plus two tables and a bucket, all on managed AWS services, buildable in a 24-hour MVP.
 - **Risks, handled:** agents can time out while a call waits, so the gateway sends progress pings and denies after 15 minutes. Spoken replies can be misheard, so only exact "approve" or "deny" counts and destructive approvals need a click. Some actions can't be undone, like a sent email, so they always pause.
 
-> **Status:** this repo holds the design and the demo video. The gateway itself is the 24-hour hack-day build described in [ARCHITECTURE.md](ARCHITECTURE.md#hack-day-build-order).
+> **Status:** a working local prototype is in [`prototype/`](prototype/README.md). It has the same gateway logic, with a Node server and local files in place of Lambda, DynamoDB and S3. The cloud deployment is the hack-day build described in [ARCHITECTURE.md](ARCHITECTURE.md#hack-day-build-order).
 
 ## Repo layout
 
 ```text
 ├── ARCHITECTURE.md            the gateway design and hack-day build order
+├── prototype/                 working gateway: MCP server, policy, undo, log, live dashboard
 ├── src/
 │   ├── DemoVideo.tsx          the 5-minute composition
 │   ├── scenes/                six scenes on the script's timestamps

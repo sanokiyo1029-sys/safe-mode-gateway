@@ -1,0 +1,3 @@
+Invoice INV-0001 (demo data)
+Client: Northwind
+Amount: 4,800.00

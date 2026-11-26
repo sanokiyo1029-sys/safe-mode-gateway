@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="operator-token" content="__OPERATOR_TOKEN__" />
+    <meta name="voice-engine" content="__VOICE__" />
+    <meta name="color-scheme" content="light" />
+    <title>Safe-Mode Gateway · Operator</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <link rel="stylesheet" href="/app.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <svg xmlns="http://www.w3.org/2000/svg" hidden>
+      <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.6-3 8.4-7 10-4-1.6-7-5.4-7-10V6z" /><path d="M9 12l2 2 4-4" /></symbol>
+      <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6H9l2 2.5h8.5A1.5 1.5 0 0 1 21 10v8.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z" /></symbol>
+      <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3h8l4 4v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" /><path d="M14 3v4h4" /></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" /><path d="M20 20l-4.2-4.2" /></symbol>
+      <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z" /><path d="M13.5 6.5l4 4" /></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></symbol>
+      <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5" /><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" /></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" /></symbol>
+      <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" /></symbol>
+      <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" /></symbol>
+      <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z" /><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" /></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2" /><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" /></symbol>
+      <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5" /><path d="M4 4v4.5h4.5" /></symbol>
+      <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12l16-7-6 16-3-6.5z" /><path d="M11 14.5L20 5" /></symbol>
+      <symbol id="i-plug" viewBox="0 0 24 24"><path d="M9 3v5M15 3v5M6 8h12v3a6 6 0 0 1-12 0zM12 17v4" /></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14" /></symbol>
+      <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" /><circle cx="12" cy="12" r="2.8" /></symbol>
+    </svg>
+
+    <header class="topbar">
+      <div class="brand">
+        <svg class="brand-mark" aria-hidden="true"><use href="#i-shield" /></svg>
+        <span class="wordmark">Safe-Mode Gateway</span>
+        <span class="conn" id="conn" role="status"><span class="dot"></span><span class="conn-text">Connecting</span></span>
+      </div>
+      <button class="endpoint" type="button" data-copy="__MCP_URL__" title="Copy the MCP endpoint">
+        <svg aria-hidden="true"><use href="#i-plug" /></svg>
+        <span class="mono">__MCP_URL__</span>
+        <svg class="endpoint-copy" aria-hidden="true"><use href="#i-copy" /></svg>
+        <span class="visually-hidden">Copy the MCP endpoint</span>
+      </button>
+      <div class="topbar-actions">
+        <button class="btn btn-quiet" type="button" id="voice-toggle" aria-pressed="false">
+          <svg aria-hidden="true"><use href="#i-volume" /></svg>
+          <span id="voice-label">Voice off</span>
+        </button>
+        <button class="btn btn-quiet" type="button" id="reset">
+          <svg aria-hidden="true"><use href="#i-reset" /></svg>
+          <span>Reset demo</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="col-left" aria-label="Workspace and policy">
+        <section class="panel workspace" aria-labelledby="workspace-title">
+          <div class="panel-head">
+            <h2 id="workspace-title">Workspace</h2>
+            <span class="hint mono">.workspace/</span>
+          </div>
+          <ul class="tree scroll" id="tree" aria-label="Files in the workspace"></ul>
+        </section>
+
+        <section class="panel policy" aria-labelledby="policy-title">
+          <div class="panel-head">
+            <h2 id="policy-title">Policy</h2>
+          </div>
+          <div class="policy-rows" id="policy"></div>
+        </section>
+      </aside>
+
+      <section class="col-main" aria-label="Decisions and calls">
+        <section class="panel decisions" aria-labelledby="decisions-title">
+          <div class="panel-head">
+            <h2 id="decisions-title">Needs your decision</h2>
+            <span class="count" id="decision-count" hidden></span>
+          </div>
+          <div id="decision-list" class="decision-list" aria-live="polite"></div>
+          <p class="empty" id="decision-empty">Nothing needs you right now. Writes and deletes stop here until you approve or deny them.</p>
+        </section>
+
+        <section class="panel stream" aria-label="Calls and activity">
+          <div class="panel-head tabs" role="tablist" aria-label="Calls and activity">
+            <button role="tab" id="tab-calls" aria-selected="true" aria-controls="calls" type="button">Live calls</button>
+            <button role="tab" id="tab-log" aria-selected="false" aria-controls="log" type="button" tabindex="-1">Activity log</button>
+            <button class="btn btn-quiet btn-small download" type="button" id="download-log" hidden>
+              <svg aria-hidden="true"><use href="#i-download" /></svg>
+              <span>Download</span>
+            </button>
+          </div>
+          <div role="tabpanel" id="calls" aria-labelledby="tab-calls" class="scroll">
+            <ol id="call-list" class="call-list"></ol>
+            <p class="empty" id="calls-empty">No calls yet. Ask the demo agent to find the brief, or connect your own agent to the MCP endpoint.</p>
+          </div>
+          <div role="tabpanel" id="log" aria-labelledby="tab-log" class="scroll" hidden>
+            <table class="log">
+              <thead>
+                <tr><th scope="col">Time</th><th scope="col">Event</th><th scope="col">Call</th><th scope="col">Detail</th></tr>
+              </thead>
+              <tbody id="log-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <aside class="col-right" aria-label="Agent">
+        <section class="panel agent" aria-labelledby="agent-title">
+          <div class="panel-head">
+            <h2 id="agent-title">Demo agent</h2>
+            <span class="agent-name mono">brief-assistant</span>
+          </div>
+          <ol class="chat scroll" id="chat" aria-live="polite"></ol>
+          <div class="tasks" id="tasks">
+            <button class="chip" type="button" data-task="brief"><svg aria-hidden="true"><use href="#i-search" /></svg>Find the brief</button>
+            <button class="chip" type="button" data-task="rename"><svg aria-hidden="true"><use href="#i-pencil" /></svg>Rename the brief</button>
+            <button class="chip" type="button" data-task="notes"><svg aria-hidden="true"><use href="#i-file" /></svg>Add to notes</button>
+            <button class="chip chip-danger" type="button" data-task="delete"><svg aria-hidden="true"><use href="#i-trash" /></svg>Delete client-files</button>
+          </div>
+          <form class="composer" id="composer">
+            <label class="visually-hidden" for="ask">Ask the demo agent</label>
+            <input id="ask" name="ask" autocomplete="off" maxlength="300" placeholder="Ask the agent, e.g. “clean up client files”" />
+            <button class="btn btn-primary btn-icon" type="submit" aria-label="Send to the agent"><svg aria-hidden="true"><use href="#i-send" /></svg></button>
+          </form>
+        </section>
+
+        <details class="panel connect">
+          <summary><svg aria-hidden="true"><use href="#i-plug" /></svg>Connect your own agent</summary>
+          <p>Point any MCP client at the gateway. Its tool calls show up here and pause exactly like the demo agent's.</p>
+          <p class="label">Claude Code</p>
+          <div class="snippet"><code class="mono">claude mcp add --transport http safe-mode __MCP_URL__</code><button class="btn btn-quiet btn-icon" type="button" data-copy="claude mcp add --transport http safe-mode __MCP_URL__" aria-label="Copy the Claude Code command"><svg aria-hidden="true"><use href="#i-copy" /></svg></button></div>
+          <p class="label">Any MCP client (Streamable HTTP)</p>
+          <div class="snippet"><code class="mono">{ "mcpServers": { "safe-mode": { "url": "__MCP_URL__" } } }</code><button class="btn btn-quiet btn-icon" type="button" data-copy='{ "mcpServers": { "safe-mode": { "url": "__MCP_URL__" } } }' aria-label="Copy the MCP config"><svg aria-hidden="true"><use href="#i-copy" /></svg></button></div>
+        </details>
+      </aside>
+    </main>
+
+    <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+  </body>
+</html>

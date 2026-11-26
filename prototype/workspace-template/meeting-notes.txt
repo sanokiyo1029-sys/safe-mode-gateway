@@ -1,0 +1,5 @@
+Kickoff notes (demo data)
+
+- Agreed on the 15 December launch date.
+- Beta clients: Northwind, Contoso, Fabrikam.
+- Open question: who signs off on the contract templates?

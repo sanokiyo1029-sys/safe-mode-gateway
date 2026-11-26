@@ -13,3 +13,8 @@ voice-samples
 # ElevenLabs website workflow: scene texts and whole-scene recordings (split into clips by build-voice).
 elevenlabs-scenes.txt
 voice-scenes
+
+# Prototype runtime data (sandbox workspace, snapshots, activity log) and secrets
+prototype/.workspace
+prototype/.data
+prototype/.env
