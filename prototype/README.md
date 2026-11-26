@@ -9,7 +9,20 @@ cd prototype
 npm install
 npm start          # dashboard at http://127.0.0.1:8787, MCP endpoint at http://127.0.0.1:8787/mcp
 npm run check      # self-check, including a real MCP client
+npm run smoke      # with the server running: plays the whole demo story, then resets it
 ```
+
+## Presenting it
+
+1. Run `npm start`, then `npm run smoke`. The smoke test plays the full story against the live server and leaves it reset, so you know it works before you go on stage.
+2. Open http://127.0.0.1:8787 and turn **Voice on**. That click lets the browser play sound, and then every new decision is read aloud.
+3. Follow the **Demo story** panel on the left. Each step has a Run button and ticks itself off when it happens:
+   1. **Find the brief:** reads run on their own.
+   2. **Deny a delete:** the agent asks to delete `client-files/`. The folder turns red in the workspace while it waits, and you deny it with **D**, a click, or by saying "deny".
+   3. **Approve a rename:** approve it with **A**, a click, or by saying "approve".
+   4. **Undo the rename.**
+   5. **Open the activity log:** every request, decision and result, including who decided and how (click, keyboard or voice).
+4. Use **Reset demo** (click it twice) between run-throughs.
 
 ## What it does
 

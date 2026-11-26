@@ -74,7 +74,10 @@ A real MCP gateway with a live operator dashboard runs locally from [`prototype/
 
 ```console
 cd prototype && npm install && npm start      # open http://127.0.0.1:8787
+npm run smoke                                 # in a second terminal: rehearses the whole demo, then resets it
 ```
+
+The **Demo story** panel walks a presenter through the video's story step by step, ticking each step off as it happens.
 
 What you can do in it:
 - Watch reads run on their own while writes and deletes stop on an approval card.

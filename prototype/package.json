@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "check": "node check.mjs"
+    "check": "node check.mjs",
+    "smoke": "node smoke.mjs"
   },
   "engines": {
     "node": ">=22"

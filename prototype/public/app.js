@@ -119,7 +119,12 @@ const cards = new Map();
 const decide = async (card, id, decision, via = "click", transcript) => {
   for (const b of card.querySelectorAll("button")) b.disabled = true;
   const ok = await act(() => api("/api/decide", { id, decision, via, transcript }));
-  if (!ok) for (const b of card.querySelectorAll("button")) b.disabled = false;
+  if (!ok) {
+    for (const b of card.querySelectorAll("button")) b.disabled = false;
+    return;
+  }
+  const how = via === "voice" ? " by voice" : "";
+  toast(decision === "approve" ? `Approved ${card.dataset.tool}${how}. It's running now.` : `Denied ${card.dataset.tool}${how}. Nothing ran.`);
 };
 
 const decisionCard = (c) => {
@@ -137,7 +142,7 @@ const decisionCard = (c) => {
   const deny = el("button", { class: "btn btn-deny", type: "button", onclick: () => decide(card, c.id, "deny") }, icon("x"), el("span", { text: "Deny" }), el("span", { class: "kbd", "aria-hidden": "true", text: "D" }));
   const card = el(
     "article",
-    { class: "decision", "data-id": c.id, "data-cls": c.cls, "data-at": String(c.at), "aria-labelledby": `d-${c.id}` },
+    { class: "decision", "data-id": c.id, "data-cls": c.cls, "data-tool": c.tool, "data-at": String(c.at), "aria-labelledby": `d-${c.id}` },
     el("div", { class: "decision-head" }, el("div", { class: "decision-icon" }, icon(ICON[c.tool] ?? "shield")), el("h3", { id: `d-${c.id}` }, ...title(c)), el("span", { class: `cls cls-${c.cls}`, text: c.cls })),
     facts(c),
     note,
@@ -204,7 +209,7 @@ document.addEventListener("keydown", (e) => {
   const card = [...cards.values()].find((c) => c.hasAttribute("data-first"));
   if (!card) return;
   e.preventDefault();
-  card.querySelector(key === "a" ? ".btn-approve" : ".btn-deny").click();
+  decide(card, card.dataset.id, key === "a" ? "approve" : "deny", "keyboard");
 });
 
 // ---------- Voice ----------
@@ -400,12 +405,23 @@ $("#download-log").addEventListener("click", () => {
 
 // ---------- Workspace ----------
 let seenPaths = null;
+// Paths a waiting call would touch: a delete marks the whole folder, a write or rename its file.
+const atRisk = () =>
+  pending().map((c) => ({ path: (c.args.path ?? c.args.from ?? "").replace(/^[/\\]+|[/\\]+$/g, ""), cls: c.cls === "destructive" ? "at-risk" : "pending" }));
+
 const renderTree = () => {
   const paths = new Set();
+  const risks = atRisk();
   const build = (nodes) =>
     nodes.map((n) => {
       paths.add(n.path);
-      const node = el("div", { class: "node", "data-dir": n.dir || null, title: n.path }, icon(n.dir ? "folder" : "file"), el("span", { text: n.dir ? `${n.name}/` : n.name }));
+      const risk = risks.find((r) => r.path && (n.path === r.path || n.path.startsWith(`${r.path}/`)));
+      const node = el(
+        "div",
+        { class: `node${risk ? ` ${risk.cls}` : ""}`, "data-dir": n.dir || null, title: risk ? `${n.path}: waiting for your decision` : n.path },
+        icon(n.dir ? "folder" : "file"),
+        el("span", { text: n.dir ? `${n.name}/` : n.name }),
+      );
       if (seenPaths && !seenPaths.has(n.path)) node.classList.add("changed");
       return el("li", {}, node, n.children?.length ? el("ul", {}, ...build(n.children)) : null);
     });
@@ -416,9 +432,9 @@ const renderTree = () => {
 
 // ---------- Policy ----------
 const POLICY = [
-  ["read", "Read", "Search, read and list files"],
-  ["write", "Write", "Create, overwrite and rename"],
-  ["destructive", "Destructive", "Delete files and folders"],
+  ["read", "Read", "Search, read, list"],
+  ["write", "Write", "Write, rename"],
+  ["destructive", "Destructive", "Delete"],
 ];
 const MODES = [
   ["run", "Run"],
@@ -536,6 +552,10 @@ const selectTab = (tab) => {
     document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
   }
   $("#download-log").hidden = tab.id !== "tab-log";
+  if (tab.id === "tab-log" && state && !logViewed) {
+    logViewed = true;
+    renderStory();
+  }
 };
 for (const t of tabs) {
   t.addEventListener("click", () => selectTab(t));
@@ -546,6 +566,82 @@ for (const t of tabs) {
     next.focus();
   });
 }
+
+// ---------- Demo story ----------
+// The video's story as a checklist for presenting: each step ticks itself off from the log.
+let logViewed = false;
+let logEpoch = null;
+const happened = (pred) => state.log.some(pred);
+const agentBusy = () => state.calls.some((c) => c.via === "demo agent" && ["paused", "running", "checking"].includes(c.status));
+const undoableRename = () => state.calls.find((c) => c.tool === "rename_file" && c.undoable);
+
+const STEPS = [
+  {
+    title: "Find the brief",
+    sub: "Reads run on their own",
+    done: () => happened((e) => e.event === "executed" && e.tool === "read_file"),
+    run: () => api("/api/agent", { task: "brief" }),
+  },
+  {
+    title: "Deny a delete",
+    sub: "The agent asks to delete client-files/",
+    done: () => happened((e) => e.event === "decided" && e.tool === "delete_folder" && e.decision === "denied"),
+    run: () => api("/api/agent", { task: "delete" }),
+  },
+  {
+    title: "Approve a rename",
+    sub: "It runs, and stays reversible",
+    done: () => happened((e) => e.event === "executed" && e.tool === "rename_file"),
+    run: () => api("/api/agent", { task: "rename" }),
+  },
+  {
+    title: "Undo the rename",
+    sub: "Back to the original name",
+    done: () => happened((e) => e.event === "undone" && e.tool === "rename_file"),
+    ready: () => Boolean(undoableRename()),
+    run: async () => {
+      const c = undoableRename();
+      if (!c) throw new Error("Do step 3 first: approve a rename.");
+      const res = await api("/api/undo", { id: c.id });
+      toast(res.text);
+    },
+  },
+  {
+    title: "Open the activity log",
+    sub: "Who asked, who decided, what ran",
+    done: () => logViewed,
+    run: async () => {
+      selectTab($("#tab-log"));
+      $("#tab-log").focus();
+    },
+  },
+];
+
+const renderStory = () => {
+  if (state.log[0]?.ts !== logEpoch) {
+    logEpoch = state.log[0]?.ts;
+    logViewed = false;
+  }
+  const busy = agentBusy();
+  const states = STEPS.map((s) => s.done());
+  const next = states.indexOf(false);
+  $("#story-progress").textContent = next === -1 ? "All done" : `${states.filter(Boolean).length} of ${STEPS.length}`;
+  $("#steps").replaceChildren(
+    ...STEPS.map((s, i) => {
+      const status = states[i] ? "done" : i === next ? "next" : "todo";
+      const blocked = i < 4 && (busy || (s.ready && !s.ready()));
+      return el(
+        "li",
+        { class: "step", "data-state": status },
+        el("span", { class: "step-mark", "aria-hidden": "true" }, states[i] ? icon("check") : String(i + 1)),
+        el("div", { class: "step-text" }, el("span", { class: "step-title", text: s.title }), el("span", { class: "step-sub", text: s.sub })),
+        states[i]
+          ? el("span", { class: "visually-hidden", text: "Done" })
+          : el("button", { class: `btn btn-small ${status === "next" ? "btn-primary" : "btn-quiet"}`, type: "button", disabled: blocked, "aria-label": `Run step ${i + 1}: ${s.title}`, onclick: () => act(s.run) }, el("span", { text: "Run" })),
+      );
+    }),
+  );
+};
 
 // ---------- Live state ----------
 const conn = $("#conn");
@@ -572,5 +668,6 @@ events.addEventListener("state", (e) => {
   renderTree();
   renderPolicy();
   renderChat();
+  renderStory();
   first = false;
 });

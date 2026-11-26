@@ -25,6 +25,11 @@ The color strategy is restrained: tinted neutrals plus one purple accent. Purple
 - **Fraunces 800** is only for the wordmark, carried over from the video.
 - Scale: 12, 12.5, 13.5, 14, 15 (panel titles), 17 (decision title), 20 (wordmark).
 
+## Demo story and at-risk files
+
+- **Demo story** (top of the left column) is the presenter's checklist. Five steps each have a Run button and tick themselves off from the activity log. The step up next gets a lavender row, a purple number and a primary Run button. Only that step shows its hint, so the list stays short. Done steps turn into green checks.
+- **While a call waits**, the workspace tree tints what it would touch: red (`--danger-bg`) for a delete, which tints the whole folder, and amber (`--write-bg`) for a write or rename.
+
 ## Shape and depth
 
 - Panels: 14px radius, a 1px line, and a soft two-layer shadow.
@@ -35,8 +40,8 @@ The color strategy is restrained: tinted neutrals plus one purple accent. Purple
 
 | Width | Layout |
 |---|---|
-| ≥1180px | Three columns: workspace and policy (290px), decisions and live calls (flexible), agent (360px). The app fills the viewport and each panel scrolls on its own. |
-| 760 to 1180px | Two columns: the main area on the left with workspace and policy below it, the agent on the right. |
+| ≥1180px | Three columns: demo story, workspace and policy (300px), decisions and live calls (flexible), agent (350px). The app fills the viewport at 1440×900 with no page scroll, and each panel scrolls on its own. |
+| 760 to 1180px | Two columns, decisions and calls beside the agent, with demo story, workspace and policy as a full-width row below. The header's endpoint chip hides below 1000px; the endpoint is still in "Connect your own agent". |
 | <760px | One column, with decisions first. The top bar collapses to icon buttons, and Deny and Approve split the card's width. |
 
 ## Motion

@@ -332,11 +332,11 @@ p {
 
 /* Layout */
 .layout {
-  flex: 1;
+  flex: none; /* not flex: 1, whose 0% basis would override the fixed height below */
   display: grid;
   gap: 16px;
   padding: 16px 20px 20px;
-  grid-template-columns: 290px minmax(0, 1fr) 360px;
+  grid-template-columns: 300px minmax(0, 1fr) 350px;
   grid-template-areas: "left main right";
   height: calc(100dvh - var(--topbar));
   min-height: 0;
@@ -433,6 +433,7 @@ p {
 
 .decision {
   display: grid;
+  min-width: 0;
   gap: 14px;
   padding: 16px 18px;
   border: 2px solid var(--ink);
@@ -830,6 +831,89 @@ p {
   color: var(--accent);
 }
 
+/* Demo story */
+.story {
+  flex: none;
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0 10px 10px;
+  display: grid;
+  gap: 2px;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 6px;
+  border-radius: var(--radius-sm);
+  transition: background-color 200ms;
+}
+
+.step[data-state="next"] {
+  background: var(--accent-soft);
+}
+
+.step-mark {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1.5px solid var(--line-2);
+  background: var(--panel);
+  font: 600 12px/1 var(--sans);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.step[data-state="next"] .step-mark {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.step[data-state="done"] .step-mark {
+  border-color: var(--read);
+  background: var(--read);
+  color: #fff;
+}
+
+.step-mark svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.5;
+}
+
+.step-text {
+  display: grid;
+  min-width: 0;
+}
+
+.step-title {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.step-sub {
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--muted);
+}
+
+/* Only the current step shows its hint, so the list stays short. */
+.step:not([data-state="next"]) .step-sub {
+  display: none;
+}
+
+.step[data-state="done"] .step-title {
+  color: var(--muted);
+}
+
 /* Workspace and policy */
 .workspace {
   flex: 1;
@@ -870,6 +954,25 @@ p {
 
 .node.changed {
   animation: row-flash 1.8s ease-out;
+}
+
+/* What a waiting call would touch: red for a delete, amber for a write or rename. */
+.node.at-risk {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.node.at-risk svg {
+  color: var(--danger);
+}
+
+.node.pending {
+  background: var(--write-bg);
+  color: var(--write);
+}
+
+.node.pending svg {
+  color: var(--write);
 }
 
 .policy {
@@ -1184,16 +1287,24 @@ p {
   .layout {
     height: auto;
     grid-template-columns: minmax(0, 1fr) 340px;
-    grid-template-areas: "main right" "left right";
+    grid-template-areas: "main right" "left left";
   }
 
   .col-left {
-    flex-direction: row;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
   }
 
-  .col-left .panel {
-    flex: 1;
+  .prow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .seg {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: start;
+    margin-top: 4px;
   }
 
   .decisions {
@@ -1211,6 +1322,12 @@ p {
 }
 
 /* Phone: one column, decisions first */
+@media (max-width: 1000px) {
+  .endpoint {
+    display: none;
+  }
+}
+
 @media (max-width: 760px) {
   .topbar {
     padding: 0 12px;
@@ -1252,8 +1369,7 @@ p {
   }
 
   .col-left {
-    flex-direction: column;
-    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .decision {

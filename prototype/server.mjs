@@ -151,7 +151,7 @@ const server = createServer(async (req, res) => {
       case "/api/decide": {
         const id = String(body.id ?? "");
         const call = gateway.state.calls.find((c) => c.id === id);
-        const via = body.via === "voice" ? "voice" : "click";
+        const via = ["voice", "keyboard"].includes(body.via) ? body.via : "click";
         if (via === "voice" && body.decision === "approve" && call?.cls === "destructive") {
           return json(res, 409, { error: "Approving a destructive call needs a click on Approve." });
         }
